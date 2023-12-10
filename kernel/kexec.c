@@ -936,7 +936,6 @@ struct kimage *kexec_image;
 struct kimage *kexec_crash_image;
 
 static DEFINE_MUTEX(kexec_mutex);
-
 SYSCALL_DEFINE4(kexec_load, unsigned long, entry, unsigned long, nr_segments,
 		struct kexec_segment __user *, segments, unsigned long, flags)
 {
@@ -1078,8 +1077,11 @@ asmlinkage long compat_sys_kexec_load(unsigned long entry,
 }
 #endif
 
+void __weak panic_flush(struct pt_regs *regs) { }
 void crash_kexec(struct pt_regs *regs)
 {
+	panic_flush(regs);
+
 	/* Take the kexec_mutex here to prevent sys_kexec_load
 	 * running on one cpu from replacing the crash kernel
 	 * we are using after a panic on a different cpu.

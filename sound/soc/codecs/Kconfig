@@ -11,6 +11,7 @@ config SND_SOC_I2C_AND_SPI
 config SND_SOC_ALL_CODECS
 	tristate "Build all ASoC CODEC drivers"
 	select SND_SOC_88PM860X if MFD_88PM860X
+	select SND_SOC_88PM805 if MFD_88PM805
 	select SND_SOC_L3
 	select SND_SOC_AC97_CODEC if SND_SOC_AC97_BUS
 	select SND_SOC_AD1836 if SPI_MASTER
@@ -120,6 +121,18 @@ config SND_SOC_ALL_CODECS
 
 config SND_SOC_88PM860X
 	tristate
+
+config SND_SOC_88PM805
+	tristate
+
+config SND_SOC_D2199
+	tristate "D2199 codec support"
+
+config SND_SOC_D2199_AAD
+	tristate "D2199 AAD support"	
+
+config D2199_AAD_WATERDROP
+	tristate "D2199 AAD Waterproof support"
 
 config SND_SOC_WM_HUBS
 	tristate
@@ -437,3 +450,8 @@ config SND_SOC_MAX9877
 
 config SND_SOC_TPA6130A2
 	tristate
+
+config SEC_FACTORY_MODE
+	bool "Factory Mode"
+	default n
+

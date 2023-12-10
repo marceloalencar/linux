@@ -5,7 +5,6 @@ power_supply-$(CONFIG_SYSFS)		+= power_supply_sysfs.o
 power_supply-$(CONFIG_LEDS_TRIGGERS)	+= power_supply_leds.o
 
 obj-$(CONFIG_POWER_SUPPLY)	+= power_supply.o
-
 obj-$(CONFIG_PDA_POWER)		+= pda_power.o
 obj-$(CONFIG_APM_POWER)		+= apm_power.o
 obj-$(CONFIG_MAX8925_POWER)	+= max8925_power.o
@@ -37,6 +36,7 @@ obj-$(CONFIG_BATTERY_INTEL_MID)	+= intel_mid_battery.o
 obj-$(CONFIG_AB8500_BM)		+= ab8500_charger.o ab8500_btemp.o ab8500_fg.o abx500_chargalg.o
 obj-$(CONFIG_CHARGER_ISP1704)	+= isp1704_charger.o
 obj-$(CONFIG_CHARGER_MAX8903)	+= max8903_charger.o
+obj-$(CONFIG_CHARGER_T7)	+= t7_charger.o
 obj-$(CONFIG_CHARGER_TWL4030)	+= twl4030_charger.o
 obj-$(CONFIG_CHARGER_LP8727)	+= lp8727_charger.o
 obj-$(CONFIG_CHARGER_GPIO)	+= gpio-charger.o
@@ -44,3 +44,22 @@ obj-$(CONFIG_CHARGER_MANAGER)	+= charger-manager.o
 obj-$(CONFIG_CHARGER_MAX8997)	+= max8997_charger.o
 obj-$(CONFIG_CHARGER_MAX8998)	+= max8998_charger.o
 obj-$(CONFIG_CHARGER_SMB347)	+= smb347-charger.o
+obj-$(CONFIG_BATTERY_ANDROID)	+= android_battery.o
+obj-$(CONFIG_CHARGER_ISL9226)   += isl9226_charger.o
+ifndef CONFIG_SPA
+obj-$(CONFIG_BATTERY_88PM80X)	+= 88pm80x_battery.o
+else
+obj-$(CONFIG_BATTERY_88PM80X)	+= 88pm80x_fuelgauge.o
+endif
+obj-$(CONFIG_SPA) += spa.o
+obj-$(CONFIG_BQ24157_CHARGER)	+= bq24157_charger.o
+obj-$(CONFIG_STC3115_FUELGAUGE) += stc3115_fuelgauge.o  stc3115_configsecure.o
+obj-$(CONFIG_FUELGAUGE_STC3115) += stc3115_configsecure_lt02.o
+ifndef CONFIG_MACH_LT02
+obj-$(CONFIG_FSA9480_MICROUSB) += fsa9480.o
+else
+obj-$(CONFIG_FSA9480_MICROUSB) += fsa9480_lt02.o
+endif
+obj-$(CONFIG_CHARGER_SMB358) += smb358_charger.o
+obj-$(CONFIG_BATTERY_D2199)	+= d2199_battery.o
+obj-$(CONFIG_I2C_RT9455)	+= rt9455.o

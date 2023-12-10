@@ -23,6 +23,8 @@ source "drivers/gpu/drm/Kconfig"
 
 source "drivers/gpu/stub/Kconfig"
 
+source "drivers/gpu/ion/Kconfig"
+
 config VGASTATE
        tristate
        default n
@@ -1880,13 +1882,40 @@ config FB_68328
 
 config FB_PXA168
 	tristate "PXA168/910 LCD framebuffer support"
-	depends on FB && (CPU_PXA168 || CPU_PXA910)
+	depends on FB && (CPU_PXA168 || CPU_PXA910 ||CPU_MMP3 || CPU_MMP2 || CPU_PXA988 || CPU_PXA1088 || CPU_EDEN)
 	select FB_CFB_FILLRECT
 	select FB_CFB_COPYAREA
 	select FB_CFB_IMAGEBLIT
+        select PXA688_PHY if (CPU_MMP3 || CPU_MMP2 || CPU_PXA988 || CPU_PXA1088)
 	---help---
 	  Frame buffer driver for the built-in LCD controller in the Marvell
 	  MMP processor.
+
+config PXA688_PHY
+        bool "MMP2/MMP3 & PXA988 LCD DSI support"
+        depends on FB && (CPU_MMP3 || CPU_MMP2 || CPU_PXA988 || CPU_PXA1088)
+
+config PXA688_VDMA
+	tristate "MMP VDMA support"
+	depends on FB && (CPU_MMP2 || CPU_MMP3)
+	help
+	  Say Y here if you want to enable VDMA for MMP2 and MMP3
+
+config PXA688_MISC
+	tristate "MMP2 MISC features support"
+	depends on FB && (CPU_MMP2 || CPU_MMP3 || CPU_PXA988 || CPU_PXA1088)
+	help
+	  Say Y here if you want to enable vertical smooth, partial display, etc.
+
+config LDI_SUPPORT_MDNIE
+	bool "enable mdnie feature"
+	help
+	  Support the mDNIE feature.
+
+config LCD_ESD_RECOVERY
+	bool "enable esd recovery feature"
+	help
+	  Support esd recovery feature.
 
 config FB_PXA
 	tristate "PXA LCD framebuffer support"
@@ -2414,6 +2443,7 @@ config FB_PUV3_UNIGFX
 source "drivers/video/omap/Kconfig"
 source "drivers/video/omap2/Kconfig"
 source "drivers/video/exynos/Kconfig"
+source "drivers/video/mmp/Kconfig"
 source "drivers/video/backlight/Kconfig"
 
 if VT

@@ -41,6 +41,15 @@
 #define PN544_GET_DEBUG		PN544_IOW(3, unsigned int)
 #define PN544_SET_DEBUG		PN544_IOW(4, unsigned int)
 
+/*
+* PN544 power control via ioctl for Android
+* PN544_SET_PWR(0): power off
+* PN544_SET_PWR(1): power on
+* PN544_SET_PWR(2): reset and power on with firmware download enabled
+*/
+#define PN544_MAGIC     0xE9
+#define PN544_SET_PWR   _IOW(PN544_MAGIC, 0x01, unsigned int)
+
 /* Timing restrictions (ms) */
 #define PN544_RESETVEN_TIME	30 /* 7 */
 #define PN544_PVDDVEN_TIME	0
@@ -91,7 +100,18 @@ struct pn544_nfc_platform_data {
 	void (*enable) (int fw);
 	int (*test) (void);
 	void (*disable) (void);
+
+	unsigned int	regulator_num;
+	char		**regulator_name;
 };
 #endif /* __KERNEL__ */
 
+#define PN544_MAGIC	0xE9
+#define PN544_SET_PWR	_IOW(PN544_MAGIC, 0x01, unsigned int)
+struct pn544_i2c_platform_data {
+	void (*conf_gpio) (void);
+	unsigned int irq_gpio;
+	unsigned int ven_gpio;
+	unsigned int firm_gpio;
+};
 #endif /* _PN544_H_ */

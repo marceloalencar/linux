@@ -16,6 +16,7 @@
 #include <linux/types.h>
 #include <linux/io.h>
 #include <linux/mmc/host.h>
+#include <linux/slab.h>
 
 struct sdhci_host {
 	/* Data set by hardware interface driver */
@@ -91,13 +92,25 @@ struct sdhci_host {
 	unsigned int quirks2;	/* More deviations from spec. */
 
 #define SDHCI_QUIRK2_HOST_OFF_CARD_ON			(1<<0)
+/* Some SDHCI v3 controller doesn't suppport current limit error*/
+#define SDHCI_QUIRK2_NO_CURRENT_LIMIT                  	(1<<1)
+#define SDHCI_QUIRK2_PRESET_VALUE_BROKEN               	(1<<2)
+/* Controller data timeout counter is 4 times long as spec defined */
+#define SDHCI_QUIRK2_TIMEOUT_DIVIDE_4			(1<<3)
+/* Controller enable HW bus clock gating by default */
+#define SDHCI_QUIRK2_BUS_CLK_GATE_ENABLED		(1<<4)
+/* Controller must disable clock gate by software during CMDs */
+#define SDHCI_QUIRK2_SDIO_SW_CLK_GATE			(1<<5)
+/* After SD host request, prevent system to suspend state for a while */
+#define SDHCI_QUIRK2_HOLDSUSPEND_AFTER_REQUEST		(1<<6)
 
 	int irq;		/* Device IRQ */
 	void __iomem *ioaddr;	/* Mapped address */
 
 	const struct sdhci_ops *ops;	/* Low level hw interface */
 
-	struct regulator *vmmc;	/* Power regulator */
+	struct regulator *vmmc;		/* Power regulator (vmmc) */
+	struct regulator *vqmmc;	/* Signaling regulator (vccq) */
 
 	/* Internal data */
 	struct mmc_host *mmc;	/* MMC structure */
@@ -122,6 +135,7 @@ struct sdhci_host {
 #define SDHCI_PV_ENABLED	(1<<8)	/* Preset value enabled */
 #define SDHCI_SDIO_IRQ_ENABLED	(1<<9)	/* SDIO irq enabled */
 #define SDHCI_HS200_NEEDS_TUNING (1<<10)	/* HS200 needs tuning */
+#define SDHCI_USING_RETUNING_TIMER (1<<11)	/* Host is using a retuning timer for the card */
 
 	unsigned int version;	/* SDHCI spec. version */
 
@@ -136,7 +150,7 @@ struct sdhci_host {
 
 	struct mmc_request *mrq;	/* Current request */
 	struct mmc_command *cmd;	/* Current command */
-	struct mmc_data *data;	/* Current data request */
+	struct mmc_data *data;		/* Current data request */
 	unsigned int data_early:1;	/* Data finished before cmd */
 
 	struct sg_mapping_iter sg_miter;	/* SG state for PIO */
@@ -147,6 +161,8 @@ struct sdhci_host {
 	u8 *adma_desc;		/* ADMA descriptor table */
 	u8 *align_buffer;	/* Bounce buffer */
 
+	struct kmem_cache *adma_cache;
+	struct kmem_cache *align_cache;
 	dma_addr_t adma_addr;	/* Mapped ADMA descr. table */
 	dma_addr_t align_addr;	/* Mapped bounce buffer */
 
@@ -155,7 +171,8 @@ struct sdhci_host {
 
 	struct timer_list timer;	/* Timer for timeouts */
 
-	unsigned int caps;	/* Alternative capabilities */
+	unsigned int caps;	/* Alternative CAPABILITY_0 */
+	unsigned int caps1;	/* Alternative CAPABILITY_1 */
 
 	unsigned int            ocr_avail_sdio;	/* OCR bit masks */
 	unsigned int            ocr_avail_sd;
@@ -166,8 +183,18 @@ struct sdhci_host {
 
 	unsigned int		tuning_count;	/* Timer count for re-tuning */
 	unsigned int		tuning_mode;	/* Re-tuning mode supported by host */
+	unsigned int		power_mode;	/* Contain the current power mode of the host */
 #define SDHCI_TUNING_MODE_1	0
 	struct timer_list	tuning_timer;	/* Timer for tuning */
+	int	constrain_ref;
+
+	/*
+	* New feature: prevent suspend if bus is keepping busy
+	* enabled by "SDHCI_QUIRK_HOLDSUSPEND_AFTER_REQUEST" in the quirks2
+	*/
+	struct wake_lock busbusy_wakelock;
+	int	busbusy_wakelock_en;
+	int	busbusy_timeout;
 
 	unsigned long private[0] ____cacheline_aligned;
 };

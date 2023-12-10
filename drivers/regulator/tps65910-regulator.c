@@ -68,7 +68,7 @@ static const u16 VAUX1_VSEL_table[] = {
 	1800, 2500, 2800, 2850,
 };
 
-/* supported VAUX2 voltages in milivolts */
+/* supported VAUX2 voltages in millivolts */
 static const u16 VAUX2_VSEL_table[] = {
 	1800, 2800, 2900, 3300,
 };

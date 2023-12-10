@@ -171,7 +171,8 @@ not_angel:
 		@ determine final kernel image address
 		mov	r4, pc
 		and	r4, r4, #0xf8000000
-		add	r4, r4, #TEXT_OFFSET
+		ldr	r3, =TEXT_OFFSET
+		add	r4, r4, r3
 #else
 		ldr	r4, =zreladdr
 #endif
@@ -638,6 +639,12 @@ __armv4_mmu_cache_on:
 
 __armv7_mmu_cache_on:
 		mov	r12, lr
+#ifdef CONFIG_CPU_CA7MP
+		@ CA7 Core - Set ACTLR.SMP bit before enabling MMU/Caches
+		mrc	p15, 0, r0, c1, c0, 1	@ Read CP15 ACTLR
+		orr	r0, r0, #1 << 6		@ Set ACTLR.SMP bit
+		mcr	p15, 0, r0, c1, c0, 1	@ Write CP15 ACTLR
+#endif
 #ifdef CONFIG_MMU
 		mrc	p15, 0, r11, c0, c1, 4	@ read ID_MMFR0
 		tst	r11, #0xf		@ VMSA
@@ -766,6 +773,8 @@ proc_types:
 @		b	__arm6_mmu_cache_off
 @		b	__armv3_mmu_cache_flush
 
+#if !defined(CONFIG_CPU_V7)
+		/* This collides with some V7 IDs, preventing correct detection */
 		.word	0x00000000		@ old ARM ID
 		.word	0x0000f000
 		mov	pc, lr
@@ -774,6 +783,7 @@ proc_types:
  THUMB(		nop				)
 		mov	pc, lr
  THUMB(		nop				)
+#endif
 
 		.word	0x41007000		@ ARM7/710
 		.word	0xfff8fe00

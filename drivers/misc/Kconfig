@@ -382,6 +382,14 @@ config HMC6352
 	  This driver provides support for the Honeywell HMC6352 compass,
 	  providing configuration and heading data via sysfs.
 
+config SENSORS_AK8975
+	tristate "AK8975 compass support"
+	default n
+	depends on I2C
+	help
+	  If you say yes here you get support for Asahi Kasei's
+	  orientation sensor AK8975.
+
 config EP93XX_PWM
 	tristate "EP93xx PWM support"
 	depends on ARCH_EP93XX
@@ -424,6 +432,10 @@ config TI_DAC7512
 
 	  This driver can also be built as a module. If so, the module
 	  will be called ti_dac7512.
+
+config UID_STAT
+	bool "UID based statistics tracking exported to /proc/uid_stat"
+	default n
 
 config VMWARE_BALLOON
 	tristate "VMware Balloon Driver"
@@ -498,6 +510,44 @@ config MAX8997_MUIC
 	  Maxim MAX8997 PMIC.
 	  The MAX8997 MUIC is a USB port accessory detector and switch.
 
+config SM5502_MUIC
+	tristate "SM5502 microUSB Switch"
+	depends on I2C
+	help
+	  The SM5502 is a USB port accessory detector and switch.
+	  The SM5502 is fully controlled using I2C and enables USB data,
+	  stereo and mono audio, video, microphone and UART data to use
+	  a common connector port.
+
+config WL127X_RFKILL
+	tristate "Bluetooth power control driver for TI wl127x"
+	depends on RFKILL
+	default n
+	---help---
+	 Creates an rfkill entry in sysfs for power control of Bluetooth
+	 TI wl127x chips.
+
+config SD8XXX_RFKILL
+        tristate "Rfkill power control for Marvell sd8xxx wlan/bt/fm"
+        depends on MMC_SDHCI_PXAV2 || MMC_SDHCI_PXAV3
+        select RFKILL
+        select WIRELESS_EXT
+        select WEXT_PRIV
+        select WEXT_SPY
+        default n
+        ---help---
+         Creates an rfkill entry in sysfs for power control of Marvell
+         sd8xxx wlan/bt/fm chips.
+
+config TC35876X
+	boolean "TC35876X chip"
+	depends on I2C && I2C_PXA
+	default n
+	help
+	  If you say yes here, you support for it.
+
+	  This driver can NOT be built as a module.
+
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
 source "drivers/misc/cb710/Kconfig"
@@ -506,4 +556,8 @@ source "drivers/misc/ti-st/Kconfig"
 source "drivers/misc/lis3lv02d/Kconfig"
 source "drivers/misc/carma/Kconfig"
 source "drivers/misc/altera-stapl/Kconfig"
+source "drivers/misc/inv_mpu/Kconfig"
+source "drivers/misc/projector/Kconfig"
+source "drivers/misc/quicklogic/Kconfig"
+
 endmenu

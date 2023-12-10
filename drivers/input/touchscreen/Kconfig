@@ -23,6 +23,19 @@ config TOUCHSCREEN_88PM860X
 	  To compile this driver as a module, choose M here: the
 	  module will be called 88pm860x-ts.
 
+config TOUCHSCREEN_FT5306
+	tristate "FT5306 Touchscreen interface support"
+	depends on I2C
+	help
+	  Say Y here if enable support for the FT5306 touchscreen controller.
+
+config TOUCHSCREEN_GT9XX
+	tristate "GT9XX Touchscreen interface support"
+	depends on I2C
+	help
+	  Say Y here if enable support for the Goodix GT9XX multi fingers
+	  touchscreen controller.
+
 config TOUCHSCREEN_ADS7846
 	tristate "ADS7846/TSC2046/AD7873 and AD(S)7843 based touchscreens"
 	depends on SPI_MASTER
@@ -41,6 +54,13 @@ config TOUCHSCREEN_ADS7846
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called ads7846.
+
+config TOUCHSCREEN_VNC
+       tristate "VNC based touchscreen"
+       help
+        Say Y here to enable support for VNC virtual touch screen driver
+        If unsure, say N.
+        If sure, say Y.
 
 config TOUCHSCREEN_AD7877
 	tristate "AD7877 based touchscreens"
@@ -451,6 +471,22 @@ config TOUCHSCREEN_TNETV107X
 	  To compile this driver as a module, choose M here: the
 	  module will be called tnetv107x-ts.
 
+config TOUCHSCREEN_SYNAPTICS_I2C_RMI
+	tristate "Synaptics i2c touchscreen"
+	depends on I2C
+	help
+	  This enables support for Synaptics RMI over I2C based touchscreens.
+
+config TOUCHSCREEN_SYNAPTICS_DSX_I2C
+	tristate "Synaptics DSX I2C touchscreen"
+	depends on I2C
+	help
+	  Say Y here if you have a Synaptics DSX I2C touchscreen
+	  connected to your system. If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called synaptics_dsx_i2c.
+
 config TOUCHSCREEN_TOUCHRIGHT
 	tristate "Touchright serial touchscreen"
 	select SERIO
@@ -845,4 +881,66 @@ config TOUCHSCREEN_TPS6507X
 	  To compile this driver as a module, choose M here: the
 	  module will be called tps6507x_ts.
 
+config TOUCHSCREEN_MMS136_TS
+       tristate "MELFAS MMS-136 touchscreen driver"
+       depends on I2C
+       default n
+       help
+         Say Y here if you have a MELFAS MMS-100 series touchscreen.
+
+         If unsure, say N.
+
+config TOUCHSCREEN_MXT224S
+	tristate "Atmel MaxTouch 224S"
+	depends on I2C
+	default n
+	help
+	  Say Y here to enable support for the Atmel MaxTouch 224 touch
+	  controller.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called mxt336S.
+
+config TOUCHSCREEN_BT432_TS
+       tristate "ZINITIX BT432 touchscreen driver"
+       depends on I2C
+       default n
+       help
+         Say Y here if you have a ZINITIX BT432 touchscreen.
+
+         If unsure, say N.
+         
+config TOUCHSCREEN_BT531_TS
+       tristate "ZINITIX BT531 touchscreen driver"
+       depends on I2C
+       default n
+       help
+         Say Y here if you have a ZINITIX BT531 touchscreen.
+
+         If unsure, say N.
+	 
+config TOUCHSCREEN_BT532_TS
+	bool "ZINITIX BT532 touchscreen driver"
+	depends on I2C
+	default n
+	help
+	  Say Y here if you have a ZINITIX BT532 touchscreen.
+
+	  If unsure, say N.	  
+
+config TOUCHSCREEN_CYPRESS_TMA46X
+	tristate "CYPRESS TMA46X I2C Touchscreen"
+	depends on I2C
+	help
+	  Say Y here if you have Cypress tma46x I2C touchscreen,
+	  such as TMA46x, connected to your system.
+
+	  If unsure, say N.
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called tma46x.
+source "drivers/input/touchscreen/MMS144/Kconfig"
 endif
+

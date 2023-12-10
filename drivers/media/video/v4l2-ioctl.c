@@ -1954,9 +1954,11 @@ static long __video_do_ioctl(struct file *file,
 		struct v4l2_dbg_register *p = arg;
 
 		if (ops->vidioc_g_register) {
+#ifndef CONFIG_ARCH_MMP
 			if (!capable(CAP_SYS_ADMIN))
 				ret = -EPERM;
 			else
+#endif
 				ret = ops->vidioc_g_register(file, fh, p);
 		}
 		break;
@@ -1966,9 +1968,11 @@ static long __video_do_ioctl(struct file *file,
 		struct v4l2_dbg_register *p = arg;
 
 		if (ops->vidioc_s_register) {
+#ifndef CONFIG_ARCH_MMP
 			if (!capable(CAP_SYS_ADMIN))
 				ret = -EPERM;
 			else
+#endif
 				ret = ops->vidioc_s_register(file, fh, p);
 		}
 		break;

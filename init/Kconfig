@@ -953,6 +953,12 @@ config SYSCTL
 config ANON_INODES
 	bool
 
+config PANIC_TIMEOUT
+	int "Default panic timeout"
+	default 0
+	help
+	  Set default panic timeout.
+
 menuconfig EXPERT
 	bool "Configure standard kernel features (expert users)"
 	# Unhide debug options, to make the on-by-default options visible
@@ -1011,6 +1017,14 @@ config KALLSYMS_ALL
 	   something like this).
 
 	   Say N unless you really need all symbols.
+
+config CGITINFO
+	 bool "Create git info for current branch"
+	 default y
+	 help
+	   Say Y here to let the kernel save git information. This increases
+	   the size of the kernel somewhat, as all infos have to be loaded into
+	   the kernel image.
 
 config HOTPLUG
 	bool "Support for hot-pluggable devices" if EXPERT

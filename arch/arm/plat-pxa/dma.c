@@ -39,6 +39,8 @@ struct dma_channel {
 static struct dma_channel *dma_channels;
 static int num_dma_channels;
 
+static DEFINE_SPINLOCK(dma_lock);
+
 /*
  * Debug fs
  */
@@ -242,7 +244,7 @@ static void pxa_dma_init_debugfs(void)
 	if (!dbgfs_state)
 		goto err_state;
 
-	dbgfs_chan = kmalloc(sizeof(*dbgfs_state) * num_dma_channels,
+	dbgfs_chan = kmalloc(sizeof(struct dentry*) * num_dma_channels,
 			     GFP_KERNEL);
 	if (!dbgfs_chan)
 		goto err_alloc;
@@ -288,7 +290,7 @@ int pxa_request_dma (char *name, pxa_dma_prio prio,
 	if (!name || !irq_handler)
 		return -EINVAL;
 
-	local_irq_save(flags);
+	spin_lock_irqsave(&dma_lock, flags);
 
 	do {
 		/* try grabbing a DMA channel with the requested priority */
@@ -312,7 +314,7 @@ int pxa_request_dma (char *name, pxa_dma_prio prio,
 		i = -ENODEV;
 	}
 
-	local_irq_restore(flags);
+	spin_unlock_irqrestore(&dma_lock, flags);
 	return i;
 }
 EXPORT_SYMBOL(pxa_request_dma);
@@ -328,10 +330,10 @@ void pxa_free_dma (int dma_ch)
 		return;
 	}
 
-	local_irq_save(flags);
+	spin_lock_irqsave(&dma_lock, flags);
 	DCSR(dma_ch) = DCSR_STARTINTR|DCSR_ENDINTR|DCSR_BUSERR;
 	dma_channels[dma_ch].name = NULL;
-	local_irq_restore(flags);
+	spin_unlock_irqrestore(&dma_lock, flags);
 }
 EXPORT_SYMBOL(pxa_free_dma);
 
@@ -340,6 +342,7 @@ static irqreturn_t dma_irq_handler(int irq, void *dev_id)
 	int i, dint = DINT;
 	struct dma_channel *channel;
 
+	spin_lock(&dma_lock);
 	while (dint) {
 		i = __ffs(dint);
 		dint &= (dint - 1);
@@ -355,6 +358,7 @@ static irqreturn_t dma_irq_handler(int irq, void *dev_id)
 			DCSR(i) = DCSR_STARTINTR|DCSR_ENDINTR|DCSR_BUSERR;
 		}
 	}
+	spin_unlock(&dma_lock);
 	return IRQ_HANDLED;
 }
 
@@ -377,7 +381,8 @@ int __init pxa_init_dma(int irq, int num_ch)
 		spin_lock_init(&dma_channels[i].lock);
 	}
 
-	ret = request_irq(irq, dma_irq_handler, IRQF_DISABLED, "DMA", NULL);
+	ret = request_irq(irq, dma_irq_handler, IRQF_DISABLED | IRQF_SHARED,
+			  "DMA", "DMAC");
 	if (ret) {
 		printk (KERN_CRIT "Wow!  Can't register IRQ for DMA\n");
 		kfree(dma_channels);

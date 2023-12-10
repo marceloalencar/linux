@@ -292,7 +292,8 @@ struct l2cap_chan *l2cap_chan_create(struct sock *sk)
 void l2cap_chan_destroy(struct l2cap_chan *chan)
 {
 	write_lock(&chan_list_lock);
-	list_del(&chan->global_l);
+	if ((&(chan->global_l))->prev != LIST_POISON2)
+		list_del(&chan->global_l);
 	write_unlock(&chan_list_lock);
 
 	l2cap_chan_put(chan);
@@ -1218,10 +1219,10 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid, bdaddr_t *d
 	auth_type = l2cap_get_auth_type(chan);
 
 	if (chan->dcid == L2CAP_CID_LE_DATA)
-		hcon = hci_connect(hdev, LE_LINK, dst,
+		hcon = hci_connect(hdev, LE_LINK, 0, dst,
 					chan->sec_level, auth_type);
 	else
-		hcon = hci_connect(hdev, ACL_LINK, dst,
+		hcon = hci_connect(hdev, ACL_LINK, 0, dst,
 					chan->sec_level, auth_type);
 
 	if (IS_ERR(hcon)) {
@@ -2574,6 +2575,13 @@ static void l2cap_conf_rfc_get(struct l2cap_chan *chan, void *rsp, int len)
 	int type, olen;
 	unsigned long val;
 	struct l2cap_conf_rfc rfc;
+
+	rfc.mode            = L2CAP_MODE_BASIC;
+	rfc.txwin_size      = 0;
+	rfc.max_transmit    = 0;
+	rfc.retrans_timeout = 0;
+	rfc.monitor_timeout = 0;
+	rfc.max_pdu_size    = 0;
 
 	BT_DBG("chan %p, rsp %p, len %d", chan, rsp, len);
 

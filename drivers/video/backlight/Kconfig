@@ -125,6 +125,15 @@ config LCD_AMS369FG06
 	  If you have an AMS369FG06 AMOLED Panel, say Y to enable its
 	  LCD control driver.
 
+config LCD_TEMPERATURE_COMPENSATION  
+	tristate "Temperature compensation needed LCD Driver"
+	depends on SPI && BACKLIGHT_CLASS_DEVICE
+	default n
+	help
+	  If you have an Panel which needed temperature compensation,
+	  say Y to enable its
+	  LCD control driver.
+
 endif # LCD_CLASS_DEVICE
 
 #
@@ -319,6 +328,30 @@ config BACKLIGHT_ADP8870
 
 	  To compile this driver as a module, choose M here: the module will
 	  be called adp8870_bl.
+
+config BACKLIGHT_KTD253
+	tristate "Backlight Driver for KTD253 using WLED"
+	depends on BACKLIGHT_CLASS_DEVICE
+	select NEW_LEDS
+	select LEDS_CLASS
+	help
+	  If you have a LCD backlight connected to the KTD253,
+	  say Y here to enable this driver.
+
+	  To compile this driver as a module, choose M here: the module will
+	  be called adp8885_bl.
+
+config BACKLIGHT_KTD3102
+	tristate "Backlight Driver for KTD3102 using WLED"
+	depends on BACKLIGHT_CLASS_DEVICE
+	select NEW_LEDS
+	select LEDS_CLASS
+	help
+	  If you have a LCD backlight connected to the KTD3102,
+	  say Y here to enable this driver.
+
+	  To compile this driver as a module, choose M here: the module will
+	  be called adp8885_bl.
 
 config BACKLIGHT_88PM860X
 	tristate "Backlight Driver for 88PM8606 using WLED"

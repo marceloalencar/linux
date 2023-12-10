@@ -102,6 +102,7 @@ extern char core_pattern[];
 extern unsigned int core_pipe_limit;
 extern int pid_max;
 extern int min_free_kbytes;
+extern int min_free_order_shift;
 extern int pid_max_min, pid_max_max;
 extern int sysctl_drop_caches;
 extern int percpu_pagelist_fraction;
@@ -113,6 +114,9 @@ extern int sysctl_nr_trim_pages;
 #endif
 #ifdef CONFIG_BLOCK
 extern int blk_iopoll_enabled;
+#endif
+#ifdef CONFIG_CMA
+extern int cma_balance_ratio;
 #endif
 
 /* Constants used for minimum and  maximum */
@@ -768,6 +772,17 @@ static struct ctl_table kern_table[] = {
 		.extra1		= &zero,
 		.extra2		= &one,
 	},
+#if defined(CONFIG_SMP_HARDLOCKUP_DETECTOR)
+	{
+		.procname	= "hardlockup_enable",
+		.data		= &hardlockup_enable,
+		.maxlen		= sizeof(int),
+		.mode		= 0644,
+		.proc_handler	= proc_hardlockup,
+		.extra1		= &zero,
+		.extra2		= &one,
+	},
+#endif
 #endif
 #if defined(CONFIG_X86_LOCAL_APIC) && defined(CONFIG_X86)
 	{
@@ -1199,6 +1214,13 @@ static struct ctl_table vm_table[] = {
 		.extra1		= &zero,
 	},
 	{
+		.procname	= "min_free_order_shift",
+		.data		= &min_free_order_shift,
+		.maxlen		= sizeof(min_free_order_shift),
+		.mode		= 0644,
+		.proc_handler	= &proc_dointvec
+	},
+	{
 		.procname	= "percpu_pagelist_fraction",
 		.data		= &percpu_pagelist_fraction,
 		.maxlen		= sizeof(percpu_pagelist_fraction),
@@ -1360,6 +1382,17 @@ static struct ctl_table vm_table[] = {
 		.proc_handler	= proc_dointvec_minmax,
 		.extra1		= &zero,
 		.extra2		= &one,
+	},
+#endif
+#ifdef CONFIG_CMA
+	{
+		.procname	= "cma_balance_ratio",
+		.data		= &cma_balance_ratio,
+		.maxlen		= sizeof(cma_balance_ratio),
+		.mode		= 0644,
+		.proc_handler	= proc_dointvec_minmax,
+		.extra1		= &zero,
+		.extra2		= &one_hundred,
 	},
 #endif
 	{ }
